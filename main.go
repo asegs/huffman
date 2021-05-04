@@ -78,6 +78,9 @@ func sortLetterList(lst []SortLetter)[]SortLetter{
 
 //fails when new element is greatest in list, inserts in second place
 func insertAtIndex(slice []LetterNode,toInsert LetterNode,index int)[]LetterNode{
+	if toInsert.letter.count>slice[len(slice)-1].letter.count{
+		return append(slice,toInsert)
+	}
 	newArr := make([]LetterNode,len(slice)+1)
 	for i:=0;i<index;i++{
 		newArr[i] = slice[i]
@@ -127,7 +130,7 @@ func main(){
 	toInsert := LetterNode{
 		letter: SortLetter{
 			val:   '~',
-			count: 70000,
+			count: 5000,
 		},
 		left:   nil,
 		right:  nil,
