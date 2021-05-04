@@ -93,9 +93,9 @@ func insertAtIndex(slice []LetterNode,toInsert LetterNode,index int)[]LetterNode
 }
 
 
-func insertAtHighestIndexLessThan(slice []LetterNode,lowerBound int,upperBound int,toInsert LetterNode,currentGreatest int,greatestIndex int)[]LetterNode{
+func insertAtHighestIndexLessThan(slice []LetterNode,lowerBound int,upperBound int,toInsert LetterNode,currentGreatest int,greatestIndex int)int{
 	if upperBound-lowerBound <= 1 || slice[lowerBound].letter.count > toInsert.letter.count{
-		return insertAtIndex(slice,toInsert,greatestIndex+1)
+		return greatestIndex+1
 	}
 	mid := (upperBound-lowerBound)/2 + lowerBound
 	val := slice[mid].letter.count
@@ -111,32 +111,42 @@ func insertAtHighestIndexLessThan(slice []LetterNode,lowerBound int,upperBound i
 }
 
 
+func toTree(sorted []LetterNode)LetterNode{
+	if len(sorted)==1{
+		return sorted[0]
+	}
+	lowest := sorted[0]
+	lower := sorted[1]
+	newNode := LetterNode{
+		letter: SortLetter{
+			val:   0,
+			count: lowest.letter.count+lower.letter.count,
+		},
+		left:   &lowest,
+		right:  &lower,
+	}
+	location := insertAtHighestIndexLessThan(sorted,0,len(sorted)-1,newNode,-1,-1)
+	sorted = insertAtIndex(sorted,newNode,location)
+	return toTree(sorted[2:])
+}
 
-
+func letterToNode(s []SortLetter)[]LetterNode{
+	nodeSorted := make([]LetterNode,len(s))
+	for i,node := range s{
+		nodeSorted[i] = LetterNode{
+			letter: node,
+			left:   nil,
+			right:  nil,
+		}
+	}
+	return nodeSorted
+}
 
 
 func main(){
 	readByteByByteIntoLetterMap("files/sample.txt")
 	result := createSortLetterList()
 	sorted := sortLetterList(result)
-	newStructs := make([]LetterNode,len(sorted))
-	for i:=0;i<len(newStructs);i++{
-		newStructs[i] = LetterNode{
-			letter: sorted[i],
-			left:   nil,
-			right:  nil,
-		}
-	}
-	toInsert := LetterNode{
-		letter: SortLetter{
-			val:   '~',
-			count: 5000,
-		},
-		left:   nil,
-		right:  nil,
-	}
-	insertAt := insertAtHighestIndexLessThan(newStructs,0,len(newStructs)-1,toInsert,-1,-1)
-	for i,s := range insertAt{
-		fmt.Printf("Index: %d  Char: %c  Count: %d\n",i,s.letter.val,s.letter.count)
-	}
+	nodeSorted := letterToNode(sorted)
+	treeNode := toTree(nodeSorted)
 }
